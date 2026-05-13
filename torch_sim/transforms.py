@@ -1383,6 +1383,23 @@ def sort_neighbors_for_csr(
     return mapping[:, order], system_mapping[order], shifts_idx[order]
 
 
+def build_csr_neighbor_list(
+    mapping: torch.Tensor,
+    system_mapping: torch.Tensor,
+    shifts_idx: torch.Tensor,
+    n_atoms: int,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Build CSR inputs for kernels that require neighbors grouped by center atom."""
+    mapping, _system_mapping, shifts_idx = sort_neighbors_for_csr(
+        mapping, system_mapping, shifts_idx
+    )
+    neighbor_ptr = torch.zeros(n_atoms + 1, dtype=torch.int32, device=mapping.device)
+    neighbor_ptr[1:] = (
+        torch.bincount(mapping[0], minlength=n_atoms).cumsum(0).to(torch.int32)
+    )
+    return mapping.to(torch.int32), neighbor_ptr, shifts_idx.to(torch.int32)
+
+
 def multiplicative_isotropic_cutoff(
     fn: Callable[..., torch.Tensor],
     r_onset: float | torch.Tensor,
