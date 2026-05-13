@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, Any
 
 import torch
 
+from torch_sim import transforms
 from torch_sim._duecredit import dcite
 from torch_sim.models.interface import ModelInterface
 from torch_sim.neighbors import torchsim_nl
@@ -140,6 +141,9 @@ class D3DispersionModel(ModelInterface):
             state.pbc,
             self.cutoff,
             state.system_idx,
+        )
+        edge_index, _mapping_system, unit_shifts = transforms.sort_neighbors_for_csr(
+            edge_index, _mapping_system, unit_shifts
         )
         n_atoms = state.positions.shape[0]
         neighbor_ptr = torch.zeros(

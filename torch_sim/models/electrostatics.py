@@ -17,6 +17,7 @@ from nvalchemiops.torch.interactions.electrostatics import (
     particle_mesh_ewald,
 )
 
+from torch_sim import transforms
 from torch_sim._duecredit import dcite
 from torch_sim.models.interface import ModelInterface
 from torch_sim.neighbors import torchsim_nl
@@ -59,6 +60,9 @@ def _build_csr(
         state.pbc,
         cutoff,
         state.system_idx,
+    )
+    edge_index, _mapping, unit_shifts = transforms.sort_neighbors_for_csr(
+        edge_index, _mapping, unit_shifts
     )
     n_atoms = state.positions.shape[0]
     dev = state.positions.device

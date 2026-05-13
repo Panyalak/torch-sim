@@ -1370,6 +1370,19 @@ def build_linked_cell_neighborhood(
     )
 
 
+def sort_neighbors_for_csr(
+    mapping: torch.Tensor,
+    system_mapping: torch.Tensor,
+    shifts_idx: torch.Tensor,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Group neighbor-list entries by central atom for CSR kernels."""
+    if mapping.shape[1] == 0:
+        return mapping, system_mapping, shifts_idx
+    original_order = torch.arange(mapping.shape[1], device=mapping.device)
+    order = torch.argsort(mapping[0] * mapping.shape[1] + original_order)
+    return mapping[:, order], system_mapping[order], shifts_idx[order]
+
+
 def multiplicative_isotropic_cutoff(
     fn: Callable[..., torch.Tensor],
     r_onset: float | torch.Tensor,
