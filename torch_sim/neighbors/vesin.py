@@ -111,12 +111,13 @@ if VESIN_AVAILABLE:
             positions_cpu = wrapped[system_mask].detach().cpu().to(dtype=torch.float64)
             cell_cpu = cell_sys.detach().cpu().to(dtype=torch.float64)
             periodic_cpu = pbc[sys_idx].detach().to(dtype=torch.bool).cpu()
+            periodic_bool = bool(torch.all(periodic_cpu).item())
 
             # Only works on CPU and returns numpy arrays
             i, j, S = neighbor_list_fn.compute(
                 points=positions_cpu,
                 box=cell_cpu,
-                periodic=periodic_cpu,
+                periodic=periodic_bool,
                 quantities="ijS",
             )
             i, j = (

@@ -101,8 +101,8 @@ class MatterSimModel(ModelInterface):
             self.model = self.model.to(dtype=self.dtype)
 
         model_args = self.model.model.model_args
-        self.two_body_cutoff = model_args["cutoff"]
-        self.three_body_cutoff = model_args["threebody_cutoff"]
+        self.two_body_cutoff = float(model_args["cutoff"])
+        self.three_body_cutoff = float(model_args["threebody_cutoff"])
 
         self.convertor = GraphConvertor(  # codespell:ignore convertor
             model_type="m3gnet",
